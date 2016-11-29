@@ -1,17 +1,15 @@
 from flask import Flask, render_template
 
 import redis
-import json
+import os
 
 app = Flask(__name__)
 
-redis_config = json.load(open("redis.json", "r"))
-
 r = redis.Redis(
-    host=redis_config["host"],
-    port=redis_config["port"],
-    db=redis_config["db"],
-    password=redis_config["auth"],
+    host=os.getenv("REDIS_HOST"),
+    port=int(os.getenv("REDIS_PORT")),
+    db=int(os.getenv("REDIS_DB")),
+    password=os.getenv("REDIS_PASSWORD"),
     decode_responses=True
 )
 
@@ -30,5 +28,6 @@ def get_servers():
         servers += int(r.get(shard_key))
 
     return str(servers)
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=80, debug=False)
+    app.run(host="0.0.0.0", port=8080, debug=False)
